@@ -1,0 +1,217 @@
+﻿// main_static.cpp
+#define CURL_STATICLIB
+#define OPENSSL_STATIC
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
+#include <random>
+#include <chrono>
+
+#include <curl/curl.h>
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
+// --- 工具函数（同前，略作精简）---
+
+std::string percentEncode(const std::string& value) {
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex << std::uppercase;
+    for (unsigned char c : value) {
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << static_cast<char>(c);
+        }
+        else {
+            escaped << '%' << std::setw(2) << static_cast<int>(c);
+        }
+    }
+    return escaped.str();
+}
+
+std::string base64Encode(const unsigned char* input, size_t length) {
+    BIO* b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    BIO* bmem = BIO_new(BIO_s_mem());
+    b64 = BIO_push(b64, bmem);
+    BIO_write(b64, input, static_cast<int>(length));
+    BIO_flush(b64);
+    BUF_MEM* bptr;
+    BIO_get_mem_ptr(b64, &bptr);
+    std::string encoded(bptr->data, bptr->length);
+    BIO_free_all(b64);
+    return encoded;
+}
+
+std::string hmacSha1Base64(const std::string& key, const std::string& data) {
+    unsigned char digest[EVP_MAX_MD_SIZE];
+    unsigned int len;
+    HMAC(EVP_sha1(),
+        reinterpret_cast<const unsigned char*>(key.data()), key.size(),
+        reinterpret_cast<const unsigned char*>(data.data()), data.size(),
+        digest, &len);
+    return base64Encode(digest, len);
+}
+
+std::string getCurrentUTCTime() {
+    auto now = std::chrono::system_clock::now();
+    auto time_t = std::chrono::system_clock::to_time_t(now);
+    std::tm utc_tm;
+    gmtime_s(&utc_tm, &time_t); // Windows
+    std::ostringstream oss;
+    oss << std::put_time(&utc_tm, "%Y-%m-%dT%H:%M:%SZ");
+    return oss.str();
+}
+
+std::string generateNonce() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 15);
+    std::stringstream ss;
+    ss << std::hex;
+    for (int i = 0; i < 16; ++i) ss << dis(gen);
+    return ss.str();
+}
+
+std::string calculateSignature(const std::map<std::string, std::string>& params, const std::string& secret) {
+    std::vector<std::string> keys;
+    for (const auto& kv : params) keys.push_back(kv.first);
+    std::sort(keys.begin(), keys.end());
+
+    std::ostringstream canonical;
+    for (size_t i = 0; i < keys.size(); ++i) {
+        if (i > 0) canonical << "&";
+        canonical << percentEncode(keys[i]) << "=" << percentEncode(params.at(keys[i]));
+    }
+
+    std::string stringToSign = "GET&%2F&" + percentEncode(canonical.str());
+    return hmacSha1Base64(secret + "&", stringToSign);
+}
+
+std::string sendHttpRequest(const std::string& url) {
+    CURL* curl = curl_easy_init();
+    if (!curl) throw std::runtime_error("curl init failed");
+
+    std::string buffer;
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, +[](void* p, size_t sz, size_t nmemb, std::string* buf) {
+        buf->append(static_cast<char*>(p), sz * nmemb);
+        return sz * nmemb;
+        });
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15L);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "AliyunDNS/1.0");
+
+    CURLcode res = curl_easy_perform(curl);
+    long httpCode = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    curl_easy_cleanup(curl);
+
+    if (res != CURLE_OK || httpCode != 200) {
+        throw std::runtime_error("HTTP error: " + std::to_string(httpCode));
+    }
+    return buffer;
+}
+
+std::string getRecordId(const std::string& ak, const std::string& sk, const std::string& domain, const std::string& rr, const std::string& type = "A") {
+    std::map<std::string, std::string> p = {
+        {"Action", "DescribeDomainRecords"},
+        {"Version", "2015-01-09"},
+        {"Format", "JSON"},
+        {"SignatureMethod", "HMAC-SHA1"},
+        {"SignatureVersion", "1.0"},
+        {"SignatureNonce", generateNonce()},
+        {"Timestamp", getCurrentUTCTime()},
+        {"AccessKeyId", ak},
+        {"DomainName", domain},
+        {"RRKeyWord", rr},
+        {"TypeKeyWord", type}
+    };
+    p["Signature"] = calculateSignature(p, sk);
+
+    std::ostringstream url;
+    url << "https://alidns.aliyuncs.com/?";
+    bool first = true;
+    for (const auto& kv : p) {
+        if (!first) url << "&";
+        url << kv.first << "=" << percentEncode(kv.second);
+        first = false;
+    }
+
+    auto resp = json::parse(sendHttpRequest(url.str()));
+    for (auto& rec : resp["DomainRecords"]["Record"]) {
+        if (rec.value("RR", "") == rr && rec.value("Type", "") == type) {
+            return rec.value("RecordId", "");
+        }
+    }
+    throw std::runtime_error("Record not found");
+}
+
+bool updateRecord(const std::string& ak, const std::string& sk, const std::string& rid, const std::string& rr, const std::string& ip) {
+    std::map<std::string, std::string> p = {
+        {"Action", "UpdateDomainRecord"},
+        {"Version", "2015-01-09"},
+        {"Format", "JSON"},
+        {"SignatureMethod", "HMAC-SHA1"},
+        {"SignatureVersion", "1.0"},
+        {"SignatureNonce", generateNonce()},
+        {"Timestamp", getCurrentUTCTime()},
+        {"AccessKeyId", ak},
+        {"RecordId", rid},
+        {"RR", rr},
+        {"Type", "A"},
+        {"Value", ip}
+    };
+    p["Signature"] = calculateSignature(p, sk);
+
+    std::ostringstream url;
+    url << "https://alidns.aliyuncs.com/?";
+    bool first = true;
+    for (const auto& kv : p) {
+        if (!first) url << "&";
+        url << kv.first << "=" << percentEncode(kv.second);
+        first = false;
+    }
+
+    auto resp = json::parse(sendHttpRequest(url.str()));
+    return resp.contains("RecordId");
+}
+
+// --- 主函数 ---
+int main() {
+    curl_global_init(CURL_GLOBAL_ALL); // 👈 静态链接时必须调用
+
+    try {
+        const std::string AK = "your-access-key-id";
+        const std::string SK = "your-access-key-secret";
+        const std::string DOM = "example.com";
+        const std::string RR = "www";
+        const std::string NEW_IP = "1.2.3.4";
+
+        std::cout << "Fetching RecordId...\n";
+        std::string rid = getRecordId(AK, SK, DOM, RR);
+        std::cout << "RecordId: " << rid << "\n";
+
+        if (updateRecord(AK, SK, rid, RR, NEW_IP)) {
+            std::cout << "Success!\n";
+        }
+        else {
+            std::cout << "Failed.\n";
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+    }
+
+    curl_global_cleanup(); // 👈 清理
+    return 0;
+}
