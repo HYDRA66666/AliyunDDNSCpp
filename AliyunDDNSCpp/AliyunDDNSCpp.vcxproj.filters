@@ -2,5 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="initializer.cpp" />
+    <ClCompile Include="configurator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="initializer.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="configurator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{01ff8c19-b9ce-4b91-98b5-7483df57bb27}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config.json">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

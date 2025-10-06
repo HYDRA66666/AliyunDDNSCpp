@@ -38,7 +38,17 @@
 #include <array>
 #include <coroutine>
 #include <generator>
-//#include <print>
+
+
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <nlohmann/json.hpp>
+#include <httplib.h>
+
+
+
 
 
 #endif //PCH_H
