@@ -48,7 +48,10 @@
 #include <httplib.h>
 
 
+#include <hydra15/Union/PrintCenter.h>
+#include <hydra15/Union/Command.h>
+#include <hydra15/Union/logger.h>
 
-
+#include <Windows.h>
 
 #endif //PCH_H

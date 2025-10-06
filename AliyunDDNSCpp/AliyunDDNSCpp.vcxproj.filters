@@ -3,12 +3,13 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="initializer.cpp" />
-    <ClCompile Include="configurator.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="initializer.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="configurator.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="资源文件">
