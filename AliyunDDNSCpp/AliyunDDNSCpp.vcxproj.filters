@@ -10,15 +10,11 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resources.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="资源文件">
       <UniqueIdentifier>{01ff8c19-b9ce-4b91-98b5-7483df57bb27}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="config.json">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
 </Project>

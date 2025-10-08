@@ -98,7 +98,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		{
 			// 检查并打开文件
 		}
-		catch (const std::exception& e) { lgr.error(e.what()); }
+		catch (const std::exception& e) { lgr.error(e.what()); is_ready = false; }
 	}
 
 	initializer::~initializer()
