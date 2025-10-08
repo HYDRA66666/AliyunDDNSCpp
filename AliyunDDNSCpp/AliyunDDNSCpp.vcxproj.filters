@@ -10,7 +10,6 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="资源文件">
@@ -21,8 +20,5 @@
     <None Include="config.json">
       <Filter>资源文件</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="AliyunDDNSCpp.rc" />
   </ItemGroup>
 </Project>
