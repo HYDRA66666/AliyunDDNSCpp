@@ -141,7 +141,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)vcpkg\installed\x64-windows\lib\libssl.lib;$(SolutionDir)vcpkg\installed\x64-windows\lib\libcrypto.lib;$(SolutionDir)libs\lib\Union.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)vcpkg\installed\x64-windows-static\lib\libssl.lib;$(SolutionDir)vcpkg\installed\x64-windows-static\lib\libcrypto.lib;$(SolutionDir)libs\lib\Union.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -154,9 +154,13 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="initializer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AliyunDDNSCpp.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

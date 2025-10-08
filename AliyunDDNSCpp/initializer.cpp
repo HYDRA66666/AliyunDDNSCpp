@@ -35,19 +35,49 @@ namespace HYDRA15::AliyunDDNSCpp
 			throw std::runtime_error(std::format(vslz.regkeyOpenFaildFormat.data(), regItem, result));
 	}
 
+	void initializer::delete_registry_item(const std::string& item)
+	{
+		std::string regItem = regPath.appRegtabRootPath.data() + item;
+		LONG result = RegDeleteTreeA(HKEY_CURRENT_USER, regItem.data());
+		if (result != ERROR_SUCCESS && result != ERROR_FILE_NOT_FOUND)
+			throw std::runtime_error(std::format(vslz.regkeyDeleteFaild.data(), regItem, result));
+	}
+
+	initializer initializer::instance;
+
+	initializer& initializer::get_instance()
+	{
+		return instance;
+	}
+
 	initializer::initializer()
 	{
 		// 初始化 commander 框架
+		try
 		{	// 设置日志文件
-			std::string logFileName = std::format(cfg.logFileFormat, Union::assistant::datetime::now_date_time("%Y-%m-%d"));
-			logFile.open(logFileName, std::ios::in | std::ios::out | std::ios::app);
-			if (!logFile.is_open())
-				lgr.warn(logFileName);
-			else
-				pc.fredirect([this](const std::string& str) {logFile << str; logFile.flush(); });
-		}
+			std::string logFileName = cfg.logFilePath.data() + std::format(cfg.logFileNameFormat.data(), Union::assistant::datetime::now_date_time("%Y-%m-%d"));
+			std::runtime_error e(std::format(vslz.logFileErrorFormat.data(), logFileName));
 
-		// 解析配置
+			// 检查并创建目录
+			if (std::filesystem::exists(cfg.logFilePath.data()))
+			{
+				if (!std::filesystem::is_directory(cfg.logFilePath.data()))
+					throw e;
+			}
+			else
+				if (!std::filesystem::create_directories(cfg.logFilePath.data()))
+					throw e;
+
+			// 打开文件
+			logFile.open(logFileName, std::ios::in | std::ios::out | std::ios::app);
+			if (logFile.is_open())
+				pc.fredirect([this](const std::string& str) {logFile << str; logFile.flush(); });
+			else
+				throw e;
+		}
+		catch (const std::exception& e) { lgr.warn(e.what()); }
+
+		// 解析注册表配置
 		try
 		{
 			accessKeyID = get_registry_item(regPath.appRegtabAccesskeyidPath.data());
@@ -63,6 +93,12 @@ namespace HYDRA15::AliyunDDNSCpp
 		try { lastIPv6 = get_registry_item(regPath.appRegtabLastipv6Path.data()); }
 		catch (const std::exception& e) { lgr.warn(e.what()); }
 
+		// 解析json配置
+		try
+		{
+			// 检查并打开文件
+		}
+		catch (const std::exception& e) { lgr.error(e.what()); }
 	}
 
 	initializer::~initializer()
@@ -88,6 +124,14 @@ namespace HYDRA15::AliyunDDNSCpp
 			try { set_registry_item(regPath.appRegtabLastipv6Path.data(), accessKeyID); }
 			catch (const std::exception& e) { lgr.error(e.what()); lgr.error(vslz.failedToSaveConfig.data()); }
 		}
+
+		// 打印日志分隔符
+		lgr.info(vslz.logSplit.data());
+
+		// 关闭文件
+		pc.sync_flush();
+		pc.fredirect(nullptr);
+		logFile.close();
 	}
 
 	hkey_guard::hkey_guard(HKEY& k)

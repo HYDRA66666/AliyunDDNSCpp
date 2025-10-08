@@ -38,6 +38,7 @@
 #include <array>
 #include <coroutine>
 #include <generator>
+#include <filesystem>
 
 
 #include <openssl/hmac.h>

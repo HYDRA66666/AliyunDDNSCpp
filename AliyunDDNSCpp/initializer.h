@@ -23,10 +23,16 @@ namespace HYDRA15::AliyunDDNSCpp
 
 		// 配置项
 	public:
+		// 注册表配置项
 		std::string accessKeyID;
 		std::string accessKeySecret;
 		std::string lastIPv4;
 		std::string lastIPv6;
+
+		// json 配置项
+		nlohmann::json configs;
+		std::string ipv4url;
+		std::string ipv6url;
 
 		// 标志位
 	private:
@@ -38,9 +44,17 @@ namespace HYDRA15::AliyunDDNSCpp
 	private:
 		static std::string get_registry_item(const std::string& item);
 		static void set_registry_item(const std::string& item, const std::string& value);
+		static void delete_registry_item(const std::string& item);
 		
+		// 单例模式
+	private:
+		static initializer instance;
 	public:
+		initializer& get_instance();
+
+	private:
 		initializer();
+	public:
 		~initializer();
 	};
 
