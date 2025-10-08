@@ -2,7 +2,7 @@
 #include "framework.h"
 #include "pch.h"
 
-namespace HYDRA15::AliyunDDNSCpp
+namespace HYDRA15::AliyunDDNSCpp::resources
 {
     static_string configJsonDemo = ""
         "{\n"

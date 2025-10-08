@@ -29,15 +29,32 @@ namespace HYDRA15::AliyunDDNSCpp
 		static_string appRegtabLastipv6Path = "LastIPv6";
 	}regPath;
 
+	static struct json_config_keys
+	{
+		static_string ipurlsKey = "urls";
+		static_string ipv4urlKey = "ipv4";
+		static_string ipv6urlKey = "ipv6";
+
+		static_string domainsLstKey = "domains";
+		static_string domainKey = "domain";
+		static_string subdomainKey = "subdomain";
+		static_string typeKey = "type";
+		static_string ttlKey = "ttl";
+	}jsonCfgKeys;
+
 	static struct visualize
 	{
 		static_string logFileErrorFormat = "Failed to open log file: {}";
 		static_string logSplit = "------------------------------------------------------------------";
+		static_string accKeyLoadedSuccess = "Successfully loaded accessKey with ID {}.";
+		static_string creatingConfigFile = "config.json not found, creating it now. Edit this file to configure the software.";
+		static_string configFileLoadSuccess = "Successfully loaded config.json, containing 2 domains to be resolved.";
 
 		// ±¨´íÏûÏ¢
 		static_string regkeyOpenFaildFormat = "Failed to open registry entry {} with code {}.";
 		static_string regkeyWriteFaildFormat = "Failed to write registry entry {} with code {}.";
 		static_string regkeyDeleteFaild = "Failed to delete registry entry {} with code {}.";
+		static_string configfileLoadFaild = "Failed to load config.json.";
 		static_string falidToLoadConfig = "Configuration failed to load correctly. It is recommended to use configuration mode when running for the first time.";
 		static_string failedToSaveConfig = "Unable to save configuration, which may affect future usage.";
 

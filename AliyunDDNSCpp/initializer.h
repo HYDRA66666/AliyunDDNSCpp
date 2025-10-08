@@ -3,6 +3,7 @@
 #include "pch.h"
 
 #include "config.h"
+#include "resources.h"
 
 using namespace HYDRA15::Union;
 
@@ -30,9 +31,9 @@ namespace HYDRA15::AliyunDDNSCpp
 		std::string lastIPv6;
 
 		// json 配置项
-		nlohmann::json configs;
 		std::string ipv4url;
 		std::string ipv6url;
+		nlohmann::json domains;
 
 		// 标志位
 	private:

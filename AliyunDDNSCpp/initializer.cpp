@@ -82,6 +82,8 @@ namespace HYDRA15::AliyunDDNSCpp
 		{
 			accessKeyID = get_registry_item(regPath.appRegtabAccesskeyidPath.data());
 			accessKeySecret = get_registry_item(regPath.appRegtabAccesskeysecretPath.data());
+
+			lgr.info(std::format(vslz.accKeyLoadedSuccess.data(), accessKeyID));
 		}
 		catch (const std::exception& e)
 		{
@@ -96,7 +98,31 @@ namespace HYDRA15::AliyunDDNSCpp
 		// 解析json配置
 		try
 		{
-			// 检查并打开文件
+			std::runtime_error e(vslz.configfileLoadFaild.data());
+			// 检查文件
+			if (std::filesystem::exists(cfg.configFilePath.data()))
+			{
+				if (std::filesystem::is_directory(cfg.configFilePath.data()))
+					throw e;
+			}
+			else
+			{
+				std::ofstream of(cfg.configFilePath.data(), std::ios::out);
+				if (!of.is_open())
+					throw e;
+				of << resources::configJsonDemo.data();
+				of.close();
+				throw std::runtime_error(vslz.creatingConfigFile.data());
+			}
+
+			// 读取文件
+			std::ifstream ifs(cfg.configFilePath.data(), std::ios::in);
+			nlohmann::json j = nlohmann::json::parse(ifs);
+			ipv4url = j[jsonCfgKeys.ipurlsKey.data()][jsonCfgKeys.ipv4urlKey.data()];
+			ipv6url = j[jsonCfgKeys.ipurlsKey.data()][jsonCfgKeys.ipv6urlKey.data()];
+			domains = j[jsonCfgKeys.domainsLstKey.data()];
+
+			lgr.info(std::format(vslz.configFileLoadSuccess.data(), domains.size()));
 		}
 		catch (const std::exception& e) { lgr.error(e.what()); is_ready = false; }
 	}
