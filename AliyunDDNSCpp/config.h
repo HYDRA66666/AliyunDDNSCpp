@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+#include "ddns_framework.h"
 #include "pch.h"
 
 namespace HYDRA15::AliyunDDNSCpp
@@ -10,6 +10,9 @@ namespace HYDRA15::AliyunDDNSCpp
 		static_string logFilePath = ".\\logs\\";
 		static_string logFileNameFormat = "{}.log";
 		static_string configFilePath = ".\\config.json";
+
+		// ∞¢¿Ô‘∆ api url
+		static_string aliyunApiUrl = "alidns.aliyuncs.com";
 
 #ifdef _DEBUG
 		static constexpr bool debug = true;
@@ -37,7 +40,7 @@ namespace HYDRA15::AliyunDDNSCpp
 
 		static_string domainsLstKey = "domains";
 		static_string domainKey = "domain";
-		static_string subdomainKey = "subdomain";
+		static_string recordKey = "record";
 		static_string typeKey = "type";
 		static_string ttlKey = "ttl";
 	}jsonCfgKeys;
@@ -59,5 +62,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		static_string failedToSaveConfig = "Unable to save configuration, which may affect future usage.";
 
 	}vslz;
+
+	using domain_info = std::tuple<std::string, std::string, std::string, unsigned int>;	// domain, record, type, ttl
 }
 

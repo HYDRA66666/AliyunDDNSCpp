@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+#include "ddns_framework.h"
 #include "pch.h"
 
 #include "config.h"
@@ -9,7 +9,13 @@ using namespace HYDRA15::Union;
 
 namespace HYDRA15::AliyunDDNSCpp 
 {
-
+	// 程序启动时配置初始化，结束时清理
+	// 配置内容：
+	//   框架对象：Command，Printcenter
+	//   日志输出
+	//   全局配置项：accessKey，lastIP，待解析域名
+	// 清理内容：
+	//   保存配置项：accessKey，lastIP
 	class initializer
 	{
 		// 私有变量
@@ -30,10 +36,13 @@ namespace HYDRA15::AliyunDDNSCpp
 		std::string lastIPv4;
 		std::string lastIPv6;
 
-		// json 配置项
+		// 获取 ip 的 url
 		std::string ipv4url;
 		std::string ipv6url;
-		nlohmann::json domains;
+
+		// 待解析的域名
+		std::list<domain_info> domains;
+		
 
 		// 标志位
 	private:

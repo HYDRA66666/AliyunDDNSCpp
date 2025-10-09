@@ -6,15 +6,15 @@
    "domains" : [
        {
            "domain": "example.com",
-           "subdomain" : "ddns",
+           "record" : "ddns",
            "type" : "A",
-           "ttl" : "60"
+           "ttl" : 600
        },
        {
            "domain": "example2.com",
-           "subdomain" : "ddns",
+           "record" : "ddns",
            "type" : "A",
-           "ttl" : "60"
+           "ttl" : 600
        }
    ]
 }

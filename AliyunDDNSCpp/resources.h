@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+#include "ddns_framework.h"
 #include "pch.h"
 
 namespace HYDRA15::AliyunDDNSCpp::resources
@@ -13,15 +13,15 @@ namespace HYDRA15::AliyunDDNSCpp::resources
         "   \"domains\" : [\n"
         "       {\n"
         "           \"domain\": \"example.com\",\n"
-        "           \"subdomain\" : \"ddns\",\n"
+        "           \"record\" : \"ddns\",\n"
         "           \"type\" : \"A\",\n"
-        "           \"ttl\" : \"60\"\n"
+        "           \"ttl\" : 600\n"
         "       },\n"
         "       {\n"
         "           \"domain\": \"example2.com\",\n"
-        "           \"subdomain\" : \"ddns\",\n"
+        "           \"record\" : \"ddns\",\n"
         "           \"type\" : \"A\",\n"
-        "           \"ttl\" : \"60\"\n"
+        "           \"ttl\" : 600\n"
         "       }\n"
         "   ]\n"
         "}\n";

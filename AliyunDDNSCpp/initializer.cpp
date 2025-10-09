@@ -115,12 +115,25 @@ namespace HYDRA15::AliyunDDNSCpp
 				throw std::runtime_error(vslz.creatingConfigFile.data());
 			}
 
-			// 读取文件
+			// 读取配置文件
 			std::ifstream ifs(cfg.configFilePath.data(), std::ios::in);
 			nlohmann::json j = nlohmann::json::parse(ifs);
 			ipv4url = j[jsonCfgKeys.ipurlsKey.data()][jsonCfgKeys.ipv4urlKey.data()];
 			ipv6url = j[jsonCfgKeys.ipurlsKey.data()][jsonCfgKeys.ipv6urlKey.data()];
-			domains = j[jsonCfgKeys.domainsLstKey.data()];
+			j = j[jsonCfgKeys.domainsLstKey.data()];
+			for (const auto& i : j)
+			{
+				try
+				{
+					domains.push_back(domain_info{
+						i[jsonCfgKeys.domainKey.data()],
+						i[jsonCfgKeys.recordKey.data()],
+						i[jsonCfgKeys.typeKey.data()],
+						i[jsonCfgKeys.ttlKey.data()]
+						});
+				}
+				catch (const std::exception& e) { lgr.error(e.what()); }
+			}
 
 			lgr.info(std::format(vslz.configFileLoadSuccess.data(), domains.size()));
 		}
