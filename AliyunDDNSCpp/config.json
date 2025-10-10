@@ -1,6 +1,6 @@
 {
    "urls": {
-       "ipv4": "https://api.ipify.org",
+       "ipv4": "https://api.ipify.cn",
        "ipv6" : "https://api6.ipify.org"
    },
    "domains" : [

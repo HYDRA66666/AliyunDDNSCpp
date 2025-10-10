@@ -6,8 +6,6 @@
 
 namespace HYDRA15::Union::commander
 {
-    static unsigned int default_thread_count = std::thread::hardware_concurrency();
-
     class GlobalThreadLake : public labourer::ThreadLake
     {
         // 单例模式

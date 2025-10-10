@@ -4,12 +4,13 @@
 
 #include "config.h"
 #include "resources.h"
+#include "command_handler.h"
 
 using namespace HYDRA15::Union;
 
 namespace HYDRA15::AliyunDDNSCpp 
 {
-	// 程序启动时配置初始化，结束时清理
+	// 程序启动时配置初始化，结束时清理，同时存储全局变量
 	// 配置内容：
 	//   框架对象：Command，Printcenter
 	//   日志输出
@@ -42,6 +43,12 @@ namespace HYDRA15::AliyunDDNSCpp
 
 		// 待解析的域名
 		std::list<domain_info> domains;
+
+		//全局变量
+	public:
+		// 当前ip
+		std::string ipv4;
+		std::string ipv6;
 		
 
 		// 标志位
@@ -55,12 +62,15 @@ namespace HYDRA15::AliyunDDNSCpp
 		static std::string get_registry_item(const std::string& item);
 		static void set_registry_item(const std::string& item, const std::string& value);
 		static void delete_registry_item(const std::string& item);
+
+		static std::string& remove_first_substr(std::string& str, const std::string& substr);
+		static std::string& lowcase(std::string& str);
 		
 		// 单例模式
 	private:
 		static initializer instance;
 	public:
-		initializer& get_instance();
+		static initializer& get_instance();
 
 	private:
 		initializer();

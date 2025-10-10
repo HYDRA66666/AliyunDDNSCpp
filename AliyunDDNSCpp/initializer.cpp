@@ -43,6 +43,22 @@ namespace HYDRA15::AliyunDDNSCpp
 			throw std::runtime_error(std::format(vslz.regkeyDeleteFaild.data(), regItem, result));
 	}
 
+	std::string& initializer::remove_first_substr(std::string& str, const std::string& substr)
+	{
+		auto it = str.find(substr);
+		if (it != str.npos)
+			str.erase(it, substr.size());
+		return str;
+	}
+
+	std::string& initializer::lowcase(std::string& str)
+	{
+		for (auto& c : str)
+			if (c >= 0x41 && c <= 0x5A)
+				c = c + 0x20;
+		return str;
+	}
+
 	initializer initializer::instance;
 
 	initializer& initializer::get_instance()
@@ -52,6 +68,8 @@ namespace HYDRA15::AliyunDDNSCpp
 
 	initializer::initializer()
 	{
+		secretary::log::debug(cfg.debug);
+
 		// 初始化 commander 框架
 		try
 		{	// 设置日志文件
@@ -118,19 +136,34 @@ namespace HYDRA15::AliyunDDNSCpp
 			// 读取配置文件
 			std::ifstream ifs(cfg.configFilePath.data(), std::ios::in);
 			nlohmann::json j = nlohmann::json::parse(ifs);
-			ipv4url = j[jsonCfgKeys.ipurlsKey.data()][jsonCfgKeys.ipv4urlKey.data()];
-			ipv6url = j[jsonCfgKeys.ipurlsKey.data()][jsonCfgKeys.ipv6urlKey.data()];
+
+			// 解析url
+			ipv4url = j.at(jsonCfgKeys.ipurlsKey.data()).at(jsonCfgKeys.ipv4urlKey.data());
+			lowcase(ipv4url);
+			remove_first_substr(ipv4url, cfg.http.data());
+			remove_first_substr(ipv4url, cfg.https.data());
+			ipv6url = j.at(jsonCfgKeys.ipurlsKey.data()).at(jsonCfgKeys.ipv6urlKey.data());
+			lowcase(ipv6url);
+			remove_first_substr(ipv6url, cfg.http.data());
+			remove_first_substr(ipv6url, cfg.https.data());
+
+			// 解析域名列表
 			j = j[jsonCfgKeys.domainsLstKey.data()];
 			for (const auto& i : j)
 			{
 				try
 				{
-					domains.push_back(domain_info{
-						i[jsonCfgKeys.domainKey.data()],
-						i[jsonCfgKeys.recordKey.data()],
-						i[jsonCfgKeys.typeKey.data()],
-						i[jsonCfgKeys.ttlKey.data()]
-						});
+					domain_info di{
+						i.at(jsonCfgKeys.domainKey.data()),
+						i.value(jsonCfgKeys.recordKey.data(),cfg.defaultRecord.data()),
+						i.value(jsonCfgKeys.typeKey.data(),cfg.defaultType.data()),
+						i.value(jsonCfgKeys.ttlKey.data(),cfg.defaultTtl)
+					};
+					// 检查和规范
+					if (std::get<0>(di).empty())
+						std::runtime_error e(vslz.invalidDomain.data());
+					if (std::get<2>(di) != "A" && std::get<2>(di) != "AAAA")
+						std::runtime_error e(vslz.invalidDomain.data());
 				}
 				catch (const std::exception& e) { lgr.error(e.what()); }
 			}
@@ -138,6 +171,12 @@ namespace HYDRA15::AliyunDDNSCpp
 			lgr.info(std::format(vslz.configFileLoadSuccess.data(), domains.size()));
 		}
 		catch (const std::exception& e) { lgr.error(e.what()); is_ready = false; }
+
+		// 注册控制函数
+		cmd.regist(cmds.getip.cmd.data(), cmds.getip.async, command_handler::getip);
+		cmd.regist(cmds.getipv4.cmd.data(), cmds.getipv4.async, command_handler::get_ipv4);
+		cmd.regist(cmds.getipv6.cmd.data(), cmds.getipv6.async, command_handler::get_ipv6);
+		
 	}
 
 	initializer::~initializer()

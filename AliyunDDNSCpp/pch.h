@@ -53,6 +53,7 @@
 #include <hydra15/Union/Command.h>
 #include <hydra15/Union/logger.h>
 #include <hydra15/Union/framework.h>
+#include <hydra15/Union/GlobalThreadLake.h>
 
 #include <Windows.h>
 

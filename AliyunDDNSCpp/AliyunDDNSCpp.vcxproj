@@ -145,12 +145,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="alidns_request.cpp" />
+    <ClCompile Include="api_requester.cpp" />
+    <ClCompile Include="command_handler.cpp" />
     <ClCompile Include="initializer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="alidns_request.h" />
     <ClInclude Include="api_requester.h" />
+    <ClInclude Include="command_handler.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="ddns_framework.h" />
     <ClInclude Include="initializer.h" />
