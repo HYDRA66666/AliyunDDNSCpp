@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "ddns_framework.h"
 #include "pch.h"
 
@@ -10,10 +10,11 @@ using namespace HYDRA15::Union;
 
 namespace HYDRA15::AliyunDDNSCpp
 {
-	// ´¦Àí api ÇëÇó
+	// å¤„ç† api è¯·æ±‚
+	// ä¸»è¦è´Ÿè´£ï¼šè®¡ç®—ç­¾åï¼Œå‘é€è¯·æ±‚
 	class api_requester_sdkv2
 	{
-		// ÇëÇó²ÎÊı
+		// è¯·æ±‚å‚æ•°
 	private:
 		const std::string accessKeyID;
 		const std::string accessKeySecret;
@@ -22,7 +23,7 @@ namespace HYDRA15::AliyunDDNSCpp
 
 		std::string fullUrl;
 
-		// ¸¨Öúº¯Êı
+		// è¾…åŠ©å‡½æ•°
 	private:
 		static std::string percent_encode(const std::string& url);
 		static std::string base64_encode(const std::vector<unsigned char>& str);
@@ -30,7 +31,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		static std::string generate_noce();
 
 		void calculate_signature();
-		// ·½·¨
+		// æ–¹æ³•
 	protected:
 		api_requester_sdkv2();
 		api_requester_sdkv2(std::unordered_map<std::string, std::string> ps);

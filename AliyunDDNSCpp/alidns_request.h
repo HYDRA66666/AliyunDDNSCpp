@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ddns_framework.h"
 #include "pch.h"
 
@@ -11,6 +11,9 @@ using namespace HYDRA15::Union;
 
 namespace HYDRA15::AliyunDDNSCpp::api_request
 {
+	// 发送具体的 api 请求
+	// 在构造时自动设置请求参数。然后使用方法一键发送请求
+
 	using api_requester = api_requester_sdkv2;
 
 	class recordid :public api_requester
@@ -20,9 +23,9 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		const std::string type;
 	public:
 		recordid(
-			const std::string& d, // ����
-			const std::string& r, // ��¼
-			const std::string& t  // ����
+			const std::string& d, // 域名
+			const std::string& r, // 记录
+			const std::string& t  // 类型
 		);
 		recordid() = delete;
 		virtual ~recordid() = default;
@@ -39,11 +42,11 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		const std::string value;
 	public:
 		addrecord(
-			const std::string& d, // ����
-			const std::string& r, // ��¼
-			const std::string& t, // ����
+			const std::string& d, // 域名
+			const std::string& r, // 记录
+			const std::string& t, // 类型
 			const std::string& l, // ttl
-			const std::string& v  // ֵ
+			const std::string& v  // 值
 		);
 		addrecord() = delete;
 		virtual ~addrecord() = default;
@@ -60,11 +63,11 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		const std::string value;
 	public:
 		update(
-			const std::string& i, // ��¼id
-			const std::string& r, // ��¼
-			const std::string& t, // ����
+			const std::string& i, // 记录id
+			const std::string& r, // 记录
+			const std::string& t, // 类型
 			const std::string& l, // ttl
-			const std::string& v  // ֵ
+			const std::string& v  // 值
 		);
 		update() = delete;
 		virtual ~update() = default;

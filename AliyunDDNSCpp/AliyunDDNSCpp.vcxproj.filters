@@ -4,7 +4,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="initializer.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="command_handler.cpp" />
+    <ClCompile Include="command_controller.cpp" />
     <ClCompile Include="api_requester.cpp" />
     <ClCompile Include="alidns_request.cpp" />
   </ItemGroup>
@@ -15,7 +15,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="api_requester.h" />
-    <ClInclude Include="command_handler.h" />
+    <ClInclude Include="command_controller.h" />
     <ClInclude Include="alidns_request.h" />
   </ItemGroup>
   <ItemGroup>

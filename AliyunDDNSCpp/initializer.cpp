@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "initializer.h"
 
 namespace HYDRA15::AliyunDDNSCpp
@@ -70,13 +70,13 @@ namespace HYDRA15::AliyunDDNSCpp
 	{
 		secretary::log::debug(cfg.debug);
 
-		// ³õÊ¼»¯ commander ¿ò¼Ü
+		// åˆå§‹åŒ– commander æ¡†æ¶
 		try
-		{	// ÉèÖÃÈÕÖ¾ÎÄ¼ş
+		{	// è®¾ç½®æ—¥å¿—æ–‡ä»¶
 			std::string logFileName = cfg.logFilePath.data() + std::format(cfg.logFileNameFormat.data(), Union::assistant::datetime::now_date_time("%Y-%m-%d"));
 			std::runtime_error e(std::format(vslz.logFileErrorFormat.data(), logFileName));
 
-			// ¼ì²é²¢´´½¨Ä¿Â¼
+			// æ£€æŸ¥å¹¶åˆ›å»ºç›®å½•
 			if (std::filesystem::exists(cfg.logFilePath.data()))
 			{
 				if (!std::filesystem::is_directory(cfg.logFilePath.data()))
@@ -86,7 +86,7 @@ namespace HYDRA15::AliyunDDNSCpp
 				if (!std::filesystem::create_directories(cfg.logFilePath.data()))
 					throw e;
 
-			// ´ò¿ªÎÄ¼ş
+			// æ‰“å¼€æ–‡ä»¶
 			logFile.open(logFileName, std::ios::in | std::ios::out | std::ios::app);
 			if (logFile.is_open())
 				pc.fredirect([this](const std::string& str) {logFile << str; logFile.flush(); });
@@ -95,7 +95,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		}
 		catch (const std::exception& e) { lgr.warn(e.what()); }
 
-		// ½âÎö×¢²á±íÅäÖÃ
+		// è§£ææ³¨å†Œè¡¨é…ç½®
 		try
 		{
 			accessKeyID = get_registry_item(regPath.appRegtabAccesskeyidPath.data());
@@ -113,11 +113,11 @@ namespace HYDRA15::AliyunDDNSCpp
 		try { lastIPv6 = get_registry_item(regPath.appRegtabLastipv6Path.data()); }
 		catch (const std::exception& e) { lgr.warn(e.what()); }
 
-		// ½âÎöjsonÅäÖÃ
+		// è§£æjsoné…ç½®
 		try
 		{
 			std::runtime_error e(vslz.configfileLoadFaild.data());
-			// ¼ì²éÎÄ¼ş
+			// æ£€æŸ¥æ–‡ä»¶
 			if (std::filesystem::exists(cfg.configFilePath.data()))
 			{
 				if (std::filesystem::is_directory(cfg.configFilePath.data()))
@@ -133,11 +133,11 @@ namespace HYDRA15::AliyunDDNSCpp
 				throw std::runtime_error(vslz.creatingConfigFile.data());
 			}
 
-			// ¶ÁÈ¡ÅäÖÃÎÄ¼ş
+			// è¯»å–é…ç½®æ–‡ä»¶
 			std::ifstream ifs(cfg.configFilePath.data(), std::ios::in);
 			nlohmann::json j = nlohmann::json::parse(ifs);
 
-			// ½âÎöurl
+			// è§£æurl
 			ipv4url = j.at(jsonCfgKeys.ipurlsKey.data()).at(jsonCfgKeys.ipv4urlKey.data());
 			lowcase(ipv4url);
 			remove_first_substr(ipv4url, cfg.http.data());
@@ -147,7 +147,7 @@ namespace HYDRA15::AliyunDDNSCpp
 			remove_first_substr(ipv6url, cfg.http.data());
 			remove_first_substr(ipv6url, cfg.https.data());
 
-			// ½âÎöÓòÃûÁĞ±í
+			// è§£æåŸŸååˆ—è¡¨
 			j = j[jsonCfgKeys.domainsLstKey.data()];
 			for (const auto& i : j)
 			{
@@ -159,7 +159,7 @@ namespace HYDRA15::AliyunDDNSCpp
 						i.value(jsonCfgKeys.typeKey.data(),cfg.defaultType.data()),
 						i.value(jsonCfgKeys.ttlKey.data(),cfg.defaultTtl)
 					};
-					// ¼ì²éºÍ¹æ·¶
+					// æ£€æŸ¥å’Œè§„èŒƒ
 					if (std::get<0>(di).empty())
 						std::runtime_error e(vslz.invalidDomain.data());
 					if (std::get<2>(di) != "A" && std::get<2>(di) != "AAAA")
@@ -172,16 +172,16 @@ namespace HYDRA15::AliyunDDNSCpp
 		}
 		catch (const std::exception& e) { lgr.error(e.what()); is_ready = false; }
 
-		// ×¢²á¿ØÖÆº¯Êı
-		cmd.regist(cmds.getip.cmd.data(), cmds.getip.async, command_handler::getip);
-		cmd.regist(cmds.getipv4.cmd.data(), cmds.getipv4.async, command_handler::get_ipv4);
-		cmd.regist(cmds.getipv6.cmd.data(), cmds.getipv6.async, command_handler::get_ipv6);
+		// æ³¨å†Œæ§åˆ¶å‡½æ•°
+		cmd.regist(cmds.getip.cmd.data(), cmds.getip.async, command_controller::getip);
+		cmd.regist(cmds.getipv4.cmd.data(), cmds.getipv4.async, command_controller::get_ipv4);
+		cmd.regist(cmds.getipv6.cmd.data(), cmds.getipv6.async, command_controller::get_ipv6);
 		
 	}
 
 	initializer::~initializer()
 	{
-		// ´æ´¢±íÏî
+		// å­˜å‚¨è¡¨é¡¹
 		if(!accessKeyID.empty())
 		{
 			try { set_registry_item(regPath.appRegtabAccesskeyidPath.data(), accessKeyID); }
@@ -203,10 +203,10 @@ namespace HYDRA15::AliyunDDNSCpp
 			catch (const std::exception& e) { lgr.error(e.what()); lgr.error(vslz.failedToSaveConfig.data()); }
 		}
 
-		// ´òÓ¡ÈÕÖ¾·Ö¸ô·û
+		// æ‰“å°æ—¥å¿—åˆ†éš”ç¬¦
 		lgr.info(vslz.logSplit.data());
 
-		// ¹Ø±ÕÎÄ¼ş
+		// å…³é—­æ–‡ä»¶
 		pc.sync_flush();
 		pc.fredirect(nullptr);
 		logFile.close();

@@ -1,4 +1,4 @@
-#include "ddns_framework.h"
+﻿#include "ddns_framework.h"
 #include "pch.h"
 
 #include "initializer.h"

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "ddns_framework.h"
 #include "pch.h"
 
@@ -6,24 +6,24 @@ namespace HYDRA15::AliyunDDNSCpp
 {
 	static struct config
 	{
-		// ÎÄ¼şÂ·¾¶
+		// æ–‡ä»¶è·¯å¾„
 		static_string logFilePath = ".\\logs\\";
 		static_string logFileNameFormat = "{}.log";
 		static_string configFilePath = ".\\config.json";
 
-		// httpÇ°×º
+		// httpå‰ç¼€
 		static_string http = "http://";
 		static_string https = "https://";
 
-		// ÅäÖÃÏîÄ¬ÈÏÖµ
+		// é…ç½®é¡¹é»˜è®¤å€¼
 		static_string defaultRecord = "@";
 		static_string defaultType = "A";
 		static_uint defaultTtl = 600;
 
-		// Ä¬ÈÏ³¬Ê±
+		// é»˜è®¤è¶…æ—¶
 		static_uint httpTimeout = 10;
 
-		// °¢ÀïÔÆ api url
+		// é˜¿é‡Œäº‘ api url
 		static_string aliyunApiUrl = "alidns.aliyuncs.com";
 
 		
@@ -37,7 +37,7 @@ namespace HYDRA15::AliyunDDNSCpp
 
 	static struct registry_path
 	{
-		// ×¢²á±íÂ·¾¶
+		// æ³¨å†Œè¡¨è·¯å¾„
 		static_string appRegtabRootPath = "HKEY_CURRENT_USER\\Software\\HYDRA15\\AliyunDDNScpp\\";
 		static_string appRegtabAccesskeyidPath = "AccessKeyID";
 		static_string appRegtabAccesskeysecretPath = "AccessKeySecret";
@@ -78,7 +78,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		static_string gotipv6 = "Current public IPv6: {}.";
 
 
-		// ±¨´íÏûÏ¢
+		// æŠ¥é”™æ¶ˆæ¯
 		static_string regkeyOpenFaildFormat = "Failed to open registry entry {} with code {}.";
 		static_string regkeyWriteFaildFormat = "Failed to write registry entry {} with code {}.";
 		static_string regkeyDeleteFaild = "Failed to delete registry entry {} with code {}.";

@@ -1,4 +1,4 @@
-#include "api_requester.h"
+﻿#include "api_requester.h"
 #include "pch.h"
 
 namespace HYDRA15::AliyunDDNSCpp

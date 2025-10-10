@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ddns_framework.h"
 #include "pch.h"
 

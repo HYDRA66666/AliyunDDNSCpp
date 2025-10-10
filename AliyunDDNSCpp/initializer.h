@@ -1,63 +1,63 @@
-#pragma once
+ï»¿#pragma once
 #include "ddns_framework.h"
 #include "pch.h"
 
 #include "config.h"
 #include "resources.h"
-#include "command_handler.h"
+#include "command_controller.h"
 
 using namespace HYDRA15::Union;
 
 namespace HYDRA15::AliyunDDNSCpp 
 {
-	// ³ÌĞòÆô¶¯Ê±ÅäÖÃ³õÊ¼»¯£¬½áÊøÊ±ÇåÀí£¬Í¬Ê±´æ´¢È«¾Ö±äÁ¿
-	// ÅäÖÃÄÚÈİ£º
-	//   ¿ò¼Ü¶ÔÏó£ºCommand£¬Printcenter
-	//   ÈÕÖ¾Êä³ö
-	//   È«¾ÖÅäÖÃÏî£ºaccessKey£¬lastIP£¬´ı½âÎöÓòÃû
-	// ÇåÀíÄÚÈİ£º
-	//   ±£´æÅäÖÃÏî£ºaccessKey£¬lastIP
+	// ç¨‹åºå¯åŠ¨æ—¶é…ç½®åˆå§‹åŒ–ï¼Œç»“æŸæ—¶æ¸…ç†ï¼ŒåŒæ—¶å­˜å‚¨å…¨å±€å˜é‡
+	// é…ç½®å†…å®¹ï¼š
+	//   æ¡†æ¶å¯¹è±¡ï¼šCommandï¼ŒPrintcenter
+	//   æ—¥å¿—è¾“å‡º
+	//   å…¨å±€é…ç½®é¡¹ï¼šaccessKeyï¼ŒlastIPï¼Œå¾…è§£æåŸŸå
+	// æ¸…ç†å†…å®¹ï¼š
+	//   ä¿å­˜é…ç½®é¡¹ï¼šaccessKeyï¼ŒlastIP
 	class initializer
 	{
-		// Ë½ÓĞ±äÁ¿
+		// ç§æœ‰å˜é‡
 	private:
 		std::fstream logFile;
 
-		// ÏµÍ³¶ÔÏó
+		// ç³»ç»Ÿå¯¹è±¡
 	private:
 		secretary::logger lgr{ "Initializer" };
 		commander::Command& cmd = commander::Command::get_instance();
 		secretary::PrintCenter& pc = secretary::PrintCenter::get_instance();
 
-		// ÅäÖÃÏî
+		// é…ç½®é¡¹
 	public:
-		// ×¢²á±íÅäÖÃÏî
+		// æ³¨å†Œè¡¨é…ç½®é¡¹
 		std::string accessKeyID;
 		std::string accessKeySecret;
 		std::string lastIPv4;
 		std::string lastIPv6;
 
-		// »ñÈ¡ ip µÄ url
+		// è·å– ip çš„ url
 		std::string ipv4url;
 		std::string ipv6url;
 
-		// ´ı½âÎöµÄÓòÃû
+		// å¾…è§£æçš„åŸŸå
 		std::list<domain_info> domains;
 
-		//È«¾Ö±äÁ¿
+		//å…¨å±€å˜é‡
 	public:
-		// µ±Ç°ip
+		// å½“å‰ip
 		std::string ipv4;
 		std::string ipv6;
 		
 
-		// ±êÖ¾Î»
+		// æ ‡å¿—ä½
 	private:
 		bool is_ready = true;
 	public:
 		bool ready() const;
 
-		// ¸¨Öúº¯Êı
+		// è¾…åŠ©å‡½æ•°
 	private:
 		static std::string get_registry_item(const std::string& item);
 		static void set_registry_item(const std::string& item, const std::string& value);
@@ -66,7 +66,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		static std::string& remove_first_substr(std::string& str, const std::string& substr);
 		static std::string& lowcase(std::string& str);
 		
-		// µ¥ÀıÄ£Ê½
+		// å•ä¾‹æ¨¡å¼
 	private:
 		static initializer instance;
 	public:

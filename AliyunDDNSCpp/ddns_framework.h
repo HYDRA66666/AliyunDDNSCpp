@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
-// cpphttplib Æô¶¯sslÖ§³Ö
+// cpphttplib å¯åŠ¨sslæ”¯æŒ
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 
-// ³£ÓÃÀàĞÍ
+// å¸¸ç”¨ç±»å‹
 //#define static_string static constexpr std::string_view
 
 

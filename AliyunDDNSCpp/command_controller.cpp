@@ -1,9 +1,9 @@
-#include "command_handler.h"
+﻿#include "command_controller.h"
 #include "pch.h"
 
 namespace HYDRA15::AliyunDDNSCpp
 {
-	void command_handler::getip(const std::list<std::string>&)
+	void command_controller::getip(const std::list<std::string>&)
 	{
         secretary::logger lgr = UNION_CREATE_LOGGER();
         lgr.debug(vslz.fetchip.data());
@@ -11,7 +11,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		commander::Command::excute(cmds.getipv6.cmd.data());
 	}
 
-    void command_handler::get_ipv4(const std::list<std::string>&)
+    void command_controller::get_ipv4(const std::list<std::string>&)
     {
         secretary::logger lgr = UNION_CREATE_LOGGER();
         std::string ipurl = initializer::get_instance().ipv4url;
@@ -38,7 +38,7 @@ namespace HYDRA15::AliyunDDNSCpp
             ));
     }
 
-    void command_handler::get_ipv6(const std::list<std::string>&)
+    void command_controller::get_ipv6(const std::list<std::string>&)
     {
         secretary::logger lgr = UNION_CREATE_LOGGER();
         std::string ipurl = initializer::get_instance().ipv6url;

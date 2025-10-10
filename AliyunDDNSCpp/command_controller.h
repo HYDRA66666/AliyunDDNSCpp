@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "ddns_framework.h"
 #include "pch.h"
 
@@ -9,8 +9,8 @@ using namespace HYDRA15::Union;
 
 namespace HYDRA15::AliyunDDNSCpp
 {
-	// ´¦ÀíÖ¸ÁîµÄº¯Êı
-	class command_handler
+	// å¤„ç†æŒ‡ä»¤çš„å‡½æ•°
+	class command_controller
 	{
 	public:
 		static void getip(const std::list<std::string>&);
