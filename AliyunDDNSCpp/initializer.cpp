@@ -391,12 +391,12 @@ namespace HYDRA15::AliyunDDNSCpp
 			// 判断ip变化
 			if (type == "AAAA" && init.lastIPv6 == init.ipv6)
 			{
-				lgr.info(vslz.ipnotchange.data(), record + ddomain);
+				lgr.info(vslz.ipnotchange.data(), record + "." + ddomain);
 				continue;
 			}
 			if (type == "A" && init.lastIPv4 == init.ipv4)
 			{
-				lgr.info(vslz.ipnotchange.data(), record + ddomain);
+				lgr.info(vslz.ipnotchange.data(), record + "." + ddomain);
 				continue;
 			}
 			std::list<std::string> args = argsFormat;
@@ -501,7 +501,7 @@ namespace HYDRA15::AliyunDDNSCpp
 			return;
 		}
 
-		lgr.debug(vslz.startResolvingDomain.data(), record + domain);
+		lgr.debug(vslz.startResolvingDomain.data(), record + "." + domain);
 		try
 		{
 			std::string recordid = api_request::recordid(domain, record, type).get();
@@ -510,9 +510,9 @@ namespace HYDRA15::AliyunDDNSCpp
 			else
 				recordid = api_request::update(recordid, record, type, ttl, value).post();
 			if (!recordid.empty())
-				lgr.info(vslz.updateSuccess.data(), record + domain, value);
+				lgr.info(vslz.updateSuccess.data(), record + "." + domain, value);
 			else
-				lgr.error(vslz.updateFaild.data(), record + domain);
+				lgr.error(vslz.updateFaild.data(), record + "." + domain);
 		}
 		catch (const std::exception& e) { lgr.error(e.what()); }
 	}
