@@ -19,9 +19,9 @@ namespace HYDRA15::AliyunDDNSCpp
         return escaped.str();
 	}
 
-    std::string api_requester_sdkv2::base64_encode(const std::vector<unsigned char>& data)
+    std::string api_requester_sdkv2::base64_encode(const std::vector<unsigned char>& d)
     {
-        std::vector<unsigned char> data = data;
+        std::vector<unsigned char> data = d;
         BIO* b64 = BIO_new(BIO_f_base64());
         BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
         BIO* bmem = BIO_new(BIO_s_mem());
@@ -40,8 +40,8 @@ namespace HYDRA15::AliyunDDNSCpp
         std::vector<unsigned char> digest(EVP_MAX_MD_SIZE);
         unsigned int len;
         HMAC(EVP_sha1(),
-            reinterpret_cast<const unsigned char*>(key.data()), key.size(),
-            reinterpret_cast<const unsigned char*>(data.data()), data.size(),
+			reinterpret_cast<const unsigned char*>(key.data()), static_cast<int>(key.size()),
+			reinterpret_cast<const unsigned char*>(data.data()), static_cast<int>(data.size()),
             digest.data(), &len);
         digest.resize(len);
         return base64_encode(digest);
@@ -62,7 +62,7 @@ namespace HYDRA15::AliyunDDNSCpp
     {
         std::list<std::string> keys;
         for (const auto& kv : params) keys.push_back(kv.first);
-        std::sort(keys.begin(), keys.end());
+		keys.sort();
 
         std::ostringstream canonical;
         bool first = true;
@@ -127,7 +127,24 @@ namespace HYDRA15::AliyunDDNSCpp
         fullUrl = cfg.https.data() + url + urp.str();
 
         httplib::SSLClient cli(url);
-        return cli.Get(urp.str());
+        auto resp = cli.Get(urp.str());
+
+		if (!resp)
+			throw std::runtime_error(std::format(
+				vslz.httpFailureUnknown.data(),
+				fullUrl
+			));
+		else if (resp->status != 200)
+			throw std::runtime_error(std::format(
+				vslz.httpFailure.data(),
+				fullUrl,
+				resp->status,
+				resp->body
+			));
+
+		lgr.debug(vslz.httpresponse.data(), fullUrl, resp->status, resp->body);
+
+		return resp;
     }
 
 

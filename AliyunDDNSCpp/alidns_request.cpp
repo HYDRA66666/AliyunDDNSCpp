@@ -15,23 +15,11 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 	std::string recordid::get()
 	{
 		auto resp = send_request();
-		if (!resp)
-			throw std::runtime_error(std::format(
-				vslz.httpFailureUnknown.data(),
-				fullUrl
-			));
-		else if (resp->status != 200)
-			throw std::runtime_error(std::format(
-				vslz.httpFailure.data(),
-				fullUrl,
-				resp->status
-			));
 
 		nlohmann::json result = nlohmann::json::parse(resp->body);
 		for (auto& rec : result["DomainRecords"]["Record"]) {
-			if (rec.value("RR", "") == record && rec.value("Type", "") == type) {
+			if (rec.value("RR", "") == record && rec.value("Type", "") == type && rec.value("DomainName", "") == domain)
 				return rec.at("RecordId");
-			}
 		}
 		return "";
 	}
@@ -47,28 +35,18 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		params["TTL"] = l;
 	}
 
-	bool update::post()
+	std::string update::post()
 	{
 		auto resp = send_request();
-		if (!resp)
-			throw std::runtime_error(std::format(
-				vslz.httpFailureUnknown.data(),
-				fullUrl
-			));
-		else if (resp->status != 200)
-			throw std::runtime_error(std::format(
-				vslz.httpFailure.data(),
-				fullUrl,
-				resp->status
-			));
+		nlohmann::json j = nlohmann::json::parse(resp->body);
 
-		if (!nlohmann::json::parse(resp->body).contains("RecordId"))
+		if (!j.contains("RecordId"))
 			throw std::runtime_error(std::format(
 				vslz.recordUpdateFailed.data(),
 				id,
 				resp->body
 			));
-		return true;
+		return j.at("RecordId");
 	}
 
 	addrecord::addrecord(const std::string& d, const std::string& r, const std::string& t, const std::string& l, const std::string& v)
@@ -82,28 +60,18 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		params["TTL"] = l;
 	}
 
-	bool addrecord::post()
+	std::string addrecord::post()
 	{
 		auto resp = send_request();
-		if (!resp)
-			throw std::runtime_error(std::format(
-				vslz.httpFailureUnknown.data(),
-				fullUrl
-			));
-		else if (resp->status != 200)
-			throw std::runtime_error(std::format(
-				vslz.httpFailure.data(),
-				fullUrl,
-				resp->status
-			));
+		nlohmann::json j = nlohmann::json::parse(resp->body);
 
-		if (!nlohmann::json::parse(resp->body).contains("RecordId"))
+		if (!j.contains("RecordId"))
 			throw std::runtime_error(std::format(
 				vslz.recordAddFailed.data(),
 				record + domain,
 				resp->body
 			));
-		return true;
+		return j.at("RecordId");
 	}
 
 }

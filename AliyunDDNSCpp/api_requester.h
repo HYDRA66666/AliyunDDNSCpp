@@ -3,7 +3,7 @@
 #include "pch.h"
 
 #include "config.h"
-#include "initializer.h"
+
 
 
 using namespace HYDRA15::Union;
@@ -22,6 +22,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		std::unordered_map<std::string, std::string> params;
 
 		std::string fullUrl;
+		secretary::logger lgr{ "api_controller" };
 
 		// 辅助函数
 	private:
@@ -42,3 +43,5 @@ namespace HYDRA15::AliyunDDNSCpp
 
 	};
 }
+
+#include "initializer.h"

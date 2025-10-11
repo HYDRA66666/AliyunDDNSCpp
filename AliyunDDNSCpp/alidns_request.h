@@ -3,7 +3,6 @@
 #include "pch.h"
 
 #include "config.h"
-#include "initializer.h"
 #include "api_requester.h"
 
 
@@ -14,7 +13,7 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 	// 发送具体的 api 请求
 	// 在构造时自动设置请求参数。然后使用方法一键发送请求
 
-	using api_requester = api_requester_sdkv2;
+	using api_requester = HYDRA15::AliyunDDNSCpp::api_requester_sdkv2;
 
 	class recordid :public api_requester
 	{
@@ -51,7 +50,7 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		addrecord() = delete;
 		virtual ~addrecord() = default;
 
-		bool post();
+		std::string post();
 	};
 
 	class update :public api_requester
@@ -72,6 +71,6 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		update() = delete;
 		virtual ~update() = default;
 
-		bool post();
+		std::string post();
 	};
 }

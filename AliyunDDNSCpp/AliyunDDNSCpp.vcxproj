@@ -147,7 +147,6 @@
   <ItemGroup>
     <ClCompile Include="alidns_request.cpp" />
     <ClCompile Include="api_requester.cpp" />
-    <ClCompile Include="command_controller.cpp" />
     <ClCompile Include="initializer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp" />
@@ -155,7 +154,6 @@
   <ItemGroup>
     <ClInclude Include="alidns_request.h" />
     <ClInclude Include="api_requester.h" />
-    <ClInclude Include="command_controller.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="ddns_framework.h" />
     <ClInclude Include="initializer.h" />

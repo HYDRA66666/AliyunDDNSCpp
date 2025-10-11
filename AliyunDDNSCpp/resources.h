@@ -6,6 +6,7 @@ namespace HYDRA15::AliyunDDNSCpp::resources
 {
     static_string configJsonDemo = ""
         "{\n"
+		"	\"force_update\": false,"
         "   \"urls\": {\n"
         "       \"ipv4\": \"https://api.ipify.org\",\n"
         "       \"ipv6\" : \"https://api6.ipify.org\"\n"
@@ -25,4 +26,13 @@ namespace HYDRA15::AliyunDDNSCpp::resources
         "       }\n"
         "   ]\n"
         "}\n";
+
+	static_string helpstr = ""
+		"Usage: \n"
+		"   Only one of the following arguments can be specified: \n"
+		"	-c  Configuration mode : \n"
+		"			run without arguments for interactive setup,\n"
+		"			or provide two arguments[accessKeyId][accessKeySecret]\n"
+		"	-s  Run silently\n"
+		"   -h  Print this help message\n";
 }
