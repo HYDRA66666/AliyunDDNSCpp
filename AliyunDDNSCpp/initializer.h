@@ -5,6 +5,7 @@
 #include "config.h"
 #include "resources.h"
 #include "alidns_request.h"
+#include "guards.h"
 
 using namespace HYDRA15::Union;
 
@@ -28,7 +29,6 @@ namespace HYDRA15::AliyunDDNSCpp
 		// 系统对象
 	private:
 		secretary::logger lgr{ "Initializer" };
-		commander::Command& cmd = commander::Command::get_instance();
 		secretary::PrintCenter& pc = secretary::PrintCenter::get_instance();
 		std::shared_ptr<labourer::ThreadLake> tl = std::make_shared<labourer::ThreadLake>(cfg.asyncThreads);
 
@@ -40,28 +40,26 @@ namespace HYDRA15::AliyunDDNSCpp
 		std::string lastIPv4;
 		std::string lastIPv6;
 
-		// 强制刷新
-		bool forceUpdate = false;
-
 		// 获取 ip 的 url
 		std::string ipv4url;
 		std::string ipv6url;
 
 		// 待解析的域名
 		std::list<domain_info> domains;
-		std::atomic<int> resolved = 0;
+
+		// 标志位
+		bool regReady = false;
+		bool domainsReady = false;
 
 		//全局变量
 	public:
-		// 当前ip
-		std::atomic<int> ipfetched = 0;
 		std::string ipv4;
 		std::string ipv6;
-		
 
-		// 标志位
-	private:
-		bool is_ready = true;
+		// 线程池
+		labourer::ThreadLake threadpool{ cfg.asyncThreads };
+		
+	public:
 
 		// 辅助函数
 	private:
@@ -82,32 +80,6 @@ namespace HYDRA15::AliyunDDNSCpp
 		initializer();
 	public:
 		~initializer();
-
-		// 指令处理函数
-	public:
-		static void startup(const std::list<std::string>& args);
-		static void help(const std::list<std::string>&);
-		static void config(const std::list<std::string>& args);
-		static void silent(const std::list<std::string>& args);
-		static void getip(const std::list<std::string>&);
-		static void get_ipv4(const std::list<std::string>&);
-		static void get_ipv6(const std::list<std::string>&);
-		static void updaterecord(const std::list<std::string>& args);
 	};
 
-	class hkey_guard
-	{
-		HKEY& hkey;
-	public:
-		hkey_guard(HKEY& k);
-		~hkey_guard();
-	};
-
-	class count_guard
-	{
-		std::atomic<int>& count;
-	public:
-		count_guard(std::atomic<int>& c);
-		~count_guard();
-	};
 }
