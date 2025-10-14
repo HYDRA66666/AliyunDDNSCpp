@@ -161,7 +161,7 @@ namespace HYDRA15::AliyunDDNSCpp
 				lowcase(ipv4url);
 				remove_first_substr(ipv4url, "http://");
 				remove_first_substr(ipv4url, "https://");
-				lgr.info("Using ipveurl {}.", ipv4url);
+				lgr.info("Using ipv4url {}.", ipv4url);
 				ipv6url = j.at("urls").value("ipv6", "");
 				lowcase(ipv6url);
 				remove_first_substr(ipv6url, "http://");

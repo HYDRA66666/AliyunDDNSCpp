@@ -60,7 +60,7 @@ static void fetch_ip(domain_info::Type type, std::latch& lth)
 		ipurl = init.ipv6url; ipstr = &init.ipv6; break;
 	}
 
-	if (ipurl.empty()) { lgr.warn("IPv{0} URL not configured; skipping retrieval of IPv{0}.", type == domain_info::Type::A ? "4" : "6"); return; }
+	if (ipurl.empty()) { lgr.warn("IPv{0} URL not configured, skipping retrieval of IPv{0}.", type == domain_info::Type::A ? "4" : "6"); return; }
 
 	lgr.debug("Starting fetching ip from {}", ipurl);
 	httplib::SSLClient cli(ipurl);
