@@ -39,6 +39,7 @@
 #include <coroutine>
 #include <generator>
 #include <filesystem>
+#include <latch>
 
 
 #include <openssl/hmac.h>
@@ -53,6 +54,7 @@
 #include <hydra15/Union/logger.h>
 #include <hydra15/Union/framework.h>
 #include <hydra15/Union/ThreadLake.h>
+#include <hydra15/Union/ScanCenter.h>
 
 #include <Windows.h>
 

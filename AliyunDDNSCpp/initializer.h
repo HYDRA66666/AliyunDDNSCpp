@@ -4,7 +4,6 @@
 
 #include "config.h"
 #include "resources.h"
-#include "alidns_request.h"
 #include "guards.h"
 
 using namespace HYDRA15::Union;
@@ -59,7 +58,9 @@ namespace HYDRA15::AliyunDDNSCpp
 		// 线程池
 		labourer::ThreadLake threadpool{ cfg.asyncThreads };
 		
+		// 功能
 	public:
+		void uninstall();
 
 		// 辅助函数
 	private:

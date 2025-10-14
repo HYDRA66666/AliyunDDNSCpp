@@ -19,4 +19,12 @@ namespace HYDRA15::AliyunDDNSCpp
 		count_guard(std::atomic<int>& c);
 		~count_guard();
 	};
+
+	class latch_guard
+	{
+		std::latch& latch;
+	public:
+		latch_guard(std::latch& lth);
+		~latch_guard();
+	};
 }

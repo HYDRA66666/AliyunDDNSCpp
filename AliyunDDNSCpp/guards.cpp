@@ -1,6 +1,8 @@
 ﻿#include "ddns_framework.h"
 #include "pch.h"
 
+#include "guards.h"
+
 namespace HYDRA15::AliyunDDNSCpp
 {
 
@@ -21,5 +23,16 @@ namespace HYDRA15::AliyunDDNSCpp
 	count_guard::~count_guard()
 	{
 		count++;
+	}
+
+	latch_guard::latch_guard(std::latch& lth)
+		:latch(lth)
+	{
+
+	}
+
+	latch_guard::~latch_guard()
+	{
+		latch.count_down();
 	}
 }

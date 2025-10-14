@@ -42,10 +42,11 @@ namespace HYDRA15::AliyunDDNSCpp
 	// 存储带解析域名的结构
 	struct domain_info
 	{
+		std::string recordID;
 		std::string domain;
 		std::string record;
-		std::string type;
 		unsigned long long ttl;
+		enum class Type :char { A = 1, AAAA = 2 }type;
 		bool forceRefresh;
 	};
 }

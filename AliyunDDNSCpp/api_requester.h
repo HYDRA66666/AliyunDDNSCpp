@@ -4,8 +4,6 @@
 
 #include "config.h"
 
-
-
 using namespace HYDRA15::Union;
 
 namespace HYDRA15::AliyunDDNSCpp

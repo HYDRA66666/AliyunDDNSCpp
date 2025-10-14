@@ -7,6 +7,19 @@ extern std::condition_variable syscv;
 
 namespace HYDRA15::AliyunDDNSCpp
 {
+	void initializer::uninstall()
+	{
+		lastIPv4.clear();
+		lastIPv6.clear();
+		accessKeyID.clear();
+		accessKeySecret.clear();
+
+		delete_registry_item(regPath.appRegtabLastipv4Path.data());
+		delete_registry_item(regPath.appRegtabLastipv6Path.data());
+		delete_registry_item(regPath.appRegtabAccesskeyidPath.data());
+		delete_registry_item(regPath.appRegtabAccesskeysecretPath.data());
+	}
+
 	std::string initializer::get_registry_item(const std::string& item)
 	{
 		HKEY hKey;
@@ -87,7 +100,7 @@ namespace HYDRA15::AliyunDDNSCpp
 					throw e;
 			}
 			else
-				if (!std::filesystem::create_directories(cfg.logFilePath.data()))
+				if (!std::filesystem::create_directory(cfg.logFilePath.data()))
 					throw e;
 
 			// 打开文件
@@ -166,14 +179,18 @@ namespace HYDRA15::AliyunDDNSCpp
 					domain_info di;
 					di.domain = i.at("domain");
 					di.record = i.value("record", "@");
-					di.type = i.value("type", "A");
+					std::string type = i.value("type", "A");
 					di.ttl = i.value("ttl", 600);
 					di.forceRefresh = i.value("force_refresh", false);
 					// 检查和规范
 					std::runtime_error e(std::format("Invalid domain config: {}.",di.domain));
 					if (di.domain.empty())
 						throw e;
-					if (di.type != "A" && di.type != "AAAA")
+					if (type == "A")
+						di.type = domain_info::Type::A;
+					else if (type == "AAAA")
+						di.type = domain_info::Type::AAAA;
+					else
 						throw e;
 					domains.push_back(di);
 				}
