@@ -60,6 +60,8 @@ static void fetch_ip(domain_info::Type type, std::latch& lth)
 		ipurl = init.ipv6url; ipstr = &init.ipv6; break;
 	}
 
+	if (ipurl.empty()) { lgr.warn("IPv{0} URL not configured; skipping retrieval of IPv{0}.", type == domain_info::Type::A ? "4" : "6"); return; }
+
 	lgr.debug("Starting fetching ip from {}", ipurl);
 	httplib::SSLClient cli(ipurl);
 	auto resp = cli.Get("/");
@@ -90,16 +92,20 @@ static void resolve_domain(domain_info& domain, std::latch& lth)
 
 	// 检查ip变化
 	bool notChange = false;
+	bool noIP = false;
 	switch (domain.type)
 	{
 	case domain_info::Type::A:
+		if (init.ipv4.empty())noIP = true;
 		if (init.ipv4 == init.lastIPv4)notChange = true;
 		break;
 	case domain_info::Type::AAAA:
+		if (init.ipv4.empty())noIP = true;
 		if (init.ipv6 == init.lastIPv6)notChange = true;
 		break;
 	}
-	if (notChange && !domain.forceUpdate) { lgr.info("IP not change, skip domain {}", fullDomain); return; }
+	if (noIP) { lgr.warn("Failed to obtain the latest IP; skipping domain {}", fullDomain); return; }
+	if (notChange && !domain.forceUpdate) { lgr.info("IP not change, skipping domain {}", fullDomain); return; }
 
 	// 获取id
 	try { domain.recordID = api_request::recordid(domain).get(); }
