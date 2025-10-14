@@ -3,13 +3,13 @@
 
 namespace HYDRA15::AliyunDDNSCpp::api_request
 {
-	recordid::recordid(const std::string& d, const std::string& r, const std::string& t)
-		:domain(d), record(r), type(t)
+	recordid::recordid(domain_info di)
+		:domainInfo(di)
 	{
 		params["Action"] = "DescribeDomainRecords";
-		params["DomainName"] = d;
-		params["RRKeyWord"] = r;
-		params["TypeKeyWord"] = t;
+		params["DomainName"] = domainInfo.domain;
+		params["RRKeyWord"] = domainInfo.record;
+		params["TypeKeyWord"] = domainInfo.type == domain_info::Type::A ? "A" : "AAAA";
 	}
 
 	std::string recordid::get()
@@ -18,21 +18,22 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 
 		nlohmann::json result = nlohmann::json::parse(resp->body);
 		for (auto& rec : result["DomainRecords"]["Record"]) {
-			if (rec.value("RR", "") == record && rec.value("Type", "") == type && rec.value("DomainName", "") == domain)
+			if (rec.value("RR", "") == domainInfo.record && rec.value("Type", "") == type && rec.value("DomainName", "") == domainInfo.domain)
 				return rec.at("RecordId");
 		}
 		return "";
 	}
 
-	update::update(const std::string& i, const std::string& r, const std::string& t, const std::string& l, const std::string& v)
-		:id(i), record(r), type(t), ttl(l), value(v)
+	update::update(domain_info di)
+		:domainInfo(di)
 	{
+		initializer& init = initializer::get_instance();
 		params["Action"] = "UpdateDomainRecord";
-		params["RecordId"] = i;
-		params["RR"] = r;
-		params["Type"] = t;
-		params["Value"] = v;
-		params["TTL"] = l;
+		params["RecordId"] = domainInfo.recordID;
+		params["RR"] = domainInfo.record;
+		params["Type"] = domainInfo.type == domain_info::Type::A ? "A" : "AAAA";
+		params["Value"] = domainInfo.type == domain_info::Type::A ? init.ipv4 : init.ipv6;
+		params["TTL"] = std::to_string(domainInfo.ttl);
 	}
 
 	std::string update::post()
@@ -42,22 +43,24 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 
 		if (!j.contains("RecordId"))
 			throw std::runtime_error(std::format(
-				vslz.recordUpdateFailed.data(),
-				id,
+				"Failed to update domain {}, response code: {}, message: \n{}.",
+				domainInfo.record + "." + domainInfo.domain,
+				resp->status,
 				resp->body
 			));
 		return j.at("RecordId");
 	}
 
-	addrecord::addrecord(const std::string& d, const std::string& r, const std::string& t, const std::string& l, const std::string& v)
-		:domain(d), record(r), type(t), ttl(l), value(v)
+	addrecord::addrecord(domain_info di)
+		:domainInfo(di)
 	{
+		initializer& init = initializer::get_instance();
 		params["Action"] = "AddDomainRecord";
-		params["DomainName"] = d;
-		params["RR"] = r;
-		params["Type"] = t;
-		params["Value"] = v;
-		params["TTL"] = l;
+		params["DomainName"] = domainInfo.domain;
+		params["RR"] = domainInfo.record;
+		params["Type"] = domainInfo.type == domain_info::Type::A ? "A" : "AAAA";
+		params["Value"] = domainInfo.type == domain_info::Type::A ? init.ipv4 : init.ipv6;
+		params["TTL"] = std::to_string(domainInfo.ttl);
 	}
 
 	std::string addrecord::post()
@@ -67,8 +70,9 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 
 		if (!j.contains("RecordId"))
 			throw std::runtime_error(std::format(
-				vslz.recordAddFailed.data(),
-				record + domain,
+				"Failed to creat record {}, response code: {}, message: \n{}.",
+				domainInfo.record + "." + domainInfo.domain,
+				resp->status,
 				resp->body
 			));
 		return j.at("RecordId");

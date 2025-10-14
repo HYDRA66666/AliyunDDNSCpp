@@ -4,6 +4,7 @@
 
 #include "config.h"
 #include "api_requester.h"
+#include "initializer.h"
 
 
 using namespace HYDRA15::Union;
@@ -17,15 +18,10 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 
 	class recordid :public api_requester
 	{
-		const std::string domain;
-		const std::string record;
+		const domain_info domainInfo;
 		const std::string type;
 	public:
-		recordid(
-			const std::string& d, // 域名
-			const std::string& r, // 记录
-			const std::string& t  // 类型
-		);
+		recordid(domain_info di);
 		recordid() = delete;
 		virtual ~recordid() = default;
 
@@ -34,19 +30,9 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 
 	class addrecord :public api_requester
 	{
-		const std::string domain;
-		const std::string record;
-		const std::string type;
-		const std::string ttl;
-		const std::string value;
+		const domain_info domainInfo;
 	public:
-		addrecord(
-			const std::string& d, // 域名
-			const std::string& r, // 记录
-			const std::string& t, // 类型
-			const std::string& l, // ttl
-			const std::string& v  // 值
-		);
+		addrecord(domain_info di); // 域名信息和值
 		addrecord() = delete;
 		virtual ~addrecord() = default;
 
@@ -55,19 +41,9 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 
 	class update :public api_requester
 	{
-		const std::string id;
-		const std::string record;
-		const std::string type;
-		const std::string ttl;
-		const std::string value;
+		const domain_info domainInfo;
 	public:
-		update(
-			const std::string& i, // 记录id
-			const std::string& r, // 记录
-			const std::string& t, // 类型
-			const std::string& l, // ttl
-			const std::string& v  // 值
-		);
+		update(domain_info di); // 域名信息和值
 		update() = delete;
 		virtual ~update() = default;
 

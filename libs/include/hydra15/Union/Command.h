@@ -9,16 +9,26 @@
 #include "utility.h"
 #include "commander_exception.h"
 #include "logger.h"
-#include "commander_streambuf.h"
+#include "ScanCenter.h"
 
 namespace HYDRA15::Union::commander
 {
-    // 接管 std 输入、输出，处理指令、调用处理函数
     // 程序需要在启动初期注册指令和对应的处理函数，指令为空的处理函数为默认处理函数
     // 处理函数不得有返回值，输入为参数列表，列表的首项一致为命令本身
-    // 指令处理函数可以是同步的也可以是异步的，但是有与控制台交互的指令必须是同步的
-    class Command :protected labourer::background
+    class Command
     {
+        using command_handler = std::function<void(const std::list<std::string>& args)>;
+        /***************************** 快捷命令 *****************************/
+    public:
+        static void regist_command(const std::string& cmd, const command_handler& handler);
+        static void regist_default_command(const command_handler& handler);
+        // 启动后台线程执行 默认的执行方式
+        static void excute(const std::string& cmdline);
+        static void excute(const std::list<std::string>& cmdline);
+        // 在调用线程执行
+        static void excute_sync(const std::string& cmdline);
+        static void excute_sync(const std::list<std::string>& cmdline);
+
         /***************************** 公  用 *****************************/
         // 单例
     private:
@@ -36,70 +46,19 @@ namespace HYDRA15::Union::commander
         {
             static_string prompt = "> ";
             static_string onExit = "Press enter to exit...";
-            static_string threadpoolNotDefined = "No thread pool specified; falling back to synchronous execution.";
+            static_string threadpoolNotDefined = "No thread pool specified, which may cause performance impact.";
             static_string unknownExptDuringExcute = "Unknown exception occured during excuting command > {}";
         }vslz;
-        static struct config
-        {
-
-        }cfg;
-        std::function<void(const std::string&)> sysprint;
-        std::function<std::string()> sysgetline;
 
         // 日志
     private:
         secretary::logger lgr{ "Commander" };
 
-        // 严格析构
-        // 如果启用，析构时等待后台线程结束，可能会要求用户按回车
-    //private:
-    //    bool strictDestruct = false;
-    //public:
-    //    void set_strict_destruct(bool sd);
-
         // 系统锁
     private:
-        std::mutex syslock;
-
-        /***************************** 输入输出 *****************************/
-    private:
-        std::streambuf* pSysOutBuf = nullptr;
-        ostreambuf* pCmdOutBuf = nullptr;
-        std::ostream* pSysOutStream = nullptr;
-
-        std::streambuf* pSysInBuf = nullptr;
-        istreambuf* pCmdInBuf = nullptr;
-        std::istream* pSysInStream = nullptr;
-
-    public:
-        static std::string getline();
-        static std::string getline(const std::string& promt);
-
-        // 异步输入，解决析构等待的问题
-    private:
-        class async_input :labourer::background
-        {
-        private:
-            std::string line;
-            std::mutex inputMutex;
-            std::condition_variable inputCv;
-            bool working = true;
-            unsigned int waiting = 0;
-
-            virtual void work(background::thread_info& info) override;
-        public:
-            std::string get_line();
-            using labourer::background::start;
-            void stop();
-            void notify_all();
-        }asyncInput;
-        friend class async_input;
+        std::shared_mutex syslock;
 
         /***************************** 指令处理 *****************************/
-        // 指令处理函数类型
-    public:
-        using command_handler = std::function<void(const std::list<std::string>& args)>;
-
         // 线程池相关
     private:
         std::shared_ptr<labourer::ThreadLake> pthreadpool = nullptr;
@@ -108,29 +67,21 @@ namespace HYDRA15::Union::commander
 
         // 指令注册与使用
     private:
-        archivist::basic_registry<std::string, std::pair<bool, command_handler>> cmdRegistry;
+        archivist::basic_registry<std::string, command_handler> cmdRegistry;
         mutable std::shared_mutex cmdRegMutex;
-        std::queue <std::list<std::string>> cmdQueue;
-        mutable std::shared_mutex cmdQueMutex; 
-        mutable std::condition_variable_any cmdQueCv;
+
     public:
-        void regist(const std::string& cmd, bool async, const command_handler& handler);
+        void regist(const std::string& cmd, const command_handler& handler);
         bool unregist(const std::string& cmd);
         bool contains(const std::string& cmd) const;
+        command_handler fetch(const std::string& cmd);
 
 
         // 指令处理
     private:
-        bool working = true;
-        virtual void work(background::thread_info& info) override;
-        static void handler_shell(const command_handler& handler, const std::list<std::string>& args);
+        static void warp(const command_handler& handler, const std::list<std::string>& args);
 
-        /***************************** 快捷命令 *****************************/
-    public:
-        static void regist_command(const std::string& cmd, bool async, const command_handler& handler);
-        static void regist_default_command(bool async, const command_handler& handler);
-        static void excute(const std::string& cmdline);
-        static void excute(const std::list<std::string>& cmdline);
+
     };
     
 }

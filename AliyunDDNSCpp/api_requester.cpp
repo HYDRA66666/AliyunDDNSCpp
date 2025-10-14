@@ -124,25 +124,25 @@ namespace HYDRA15::AliyunDDNSCpp
             first = false;
         }
 
-        fullUrl = cfg.https.data() + url + urp.str();
+        fullUrl = "https://" + url + urp.str();
 
         httplib::SSLClient cli(url);
         auto resp = cli.Get(urp.str());
 
 		if (!resp)
 			throw std::runtime_error(std::format(
-				vslz.httpFailureUnknown.data(),
+				"Http request {} failed.",
 				fullUrl
 			));
 		else if (resp->status != 200)
 			throw std::runtime_error(std::format(
-				vslz.httpFailure.data(),
+				"Http request {} failed with code {}, body \n{}",
 				fullUrl,
 				resp->status,
 				resp->body
 			));
 
-		lgr.debug(vslz.httpresponse.data(), fullUrl, resp->status, resp->body);
+		lgr.debug("Request: {}, code: {}, body: \n{}", fullUrl, resp->status, resp->body);
 
 		return resp;
     }
