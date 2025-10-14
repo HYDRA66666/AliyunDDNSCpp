@@ -99,7 +99,7 @@ static void resolve_domain(domain_info& domain, std::latch& lth)
 		if (init.ipv6 == init.lastIPv6)notChange = true;
 		break;
 	}
-	if (notChange) { lgr.info("IP not change, skip domain {}", fullDomain); return; }
+	if (notChange && !domain.forceUpdate) { lgr.info("IP not change, skip domain {}", fullDomain); return; }
 
 	// 获取id
 	try { domain.recordID = api_request::recordid(domain).get(); }

@@ -181,7 +181,7 @@ namespace HYDRA15::AliyunDDNSCpp
 					di.record = i.value("record", "@");
 					std::string type = i.value("type", "A");
 					di.ttl = i.value("ttl", 600);
-					di.forceRefresh = i.value("force_refresh", false);
+					di.forceUpdate = i.value("force_refresh", false);
 					// 检查和规范
 					std::runtime_error e(std::format("Invalid domain config: {}.",di.domain));
 					if (di.domain.empty())

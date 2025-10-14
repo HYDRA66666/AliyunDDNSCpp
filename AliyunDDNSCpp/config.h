@@ -47,7 +47,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		std::string record;
 		unsigned long long ttl;
 		enum class Type :char { A = 1, AAAA = 2 }type;
-		bool forceRefresh;
+		bool forceUpdate;
 	};
 }
 
