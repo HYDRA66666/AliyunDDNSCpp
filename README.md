@@ -54,6 +54,7 @@ AccessKey 设置完成后，退出程序，修改程序创建的文件 ``config.
   - -c 
     - 无参数：进入交互式配置界面，用于输入 AccessKeyID 和 AccessKeuSecret
     - 后跟随两个参数：直接配置 AccessKeyID 和 AccessKeySecret
+  -  -d 删除所有本软件生成的注册表项
   - -s 静默运行
 
 
