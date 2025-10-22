@@ -36,12 +36,10 @@ namespace HYDRA15::AliyunDDNSCpp
 		// 注册表配置项
 		std::string accessKeyID;
 		std::string accessKeySecret;
-		std::string lastIPv4;
-		std::string lastIPv6;
 
 		// 获取 ip 的 url
-		std::string ipv4url;
-		std::string ipv6url;
+		std::list<std::string> ipv4urls;
+		std::list<std::string> ipv6urls;
 
 		// 待解析的域名
 		std::list<domain_info> domains;
@@ -69,6 +67,7 @@ namespace HYDRA15::AliyunDDNSCpp
 		static void delete_registry_item(const std::string& item);
 
 		static std::string& remove_first_substr(std::string& str, const std::string& substr);
+	public:
 		static std::string& lowcase(std::string& str);
 		
 		// 单例模式

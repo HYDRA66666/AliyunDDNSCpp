@@ -16,16 +16,16 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 
 	using api_requester = HYDRA15::AliyunDDNSCpp::api_requester_sdkv2;
 
-	class recordid :public api_requester
+	class record :public api_requester
 	{
 		const domain_info domainInfo;
 		std::string type;
 	public:
-		recordid(domain_info di);
-		recordid() = delete;
-		virtual ~recordid() = default;
+		record(domain_info di);
+		record() = delete;
+		virtual ~record() = default;
 
-		std::string get();
+		std::pair<std::string,std::string> get();	// std::pair<RecordID, Value>
 	};
 
 	class addrecord :public api_requester

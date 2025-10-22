@@ -49,12 +49,7 @@
 #include <nlohmann/json.hpp>
 #include <httplib.h>
 
-
-#include <hydra15/Union/PrintCenter.h>
-#include <hydra15/Union/logger.h>
-#include <hydra15/Union/framework.h>
-#include <hydra15/Union/ThreadLake.h>
-#include <hydra15/Union/ScanCenter.h>
+#include <hydra15/Union.h>
 
 #include <Windows.h>
 

@@ -3,7 +3,7 @@
 
 namespace HYDRA15::AliyunDDNSCpp::api_request
 {
-	recordid::recordid(domain_info di)
+	record::record(domain_info di)
 		:domainInfo(di)
 	{
 		params["Action"] = "DescribeDomainRecords";
@@ -12,16 +12,16 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		params["TypeKeyWord"] = type = domainInfo.type == domain_info::Type::A ? "A" : "AAAA";
 	}
 
-	std::string recordid::get()
+	std::pair<std::string,std::string> record::get()
 	{
 		auto resp = send_request();
 
 		nlohmann::json result = nlohmann::json::parse(resp->body);
 		for (auto& rec : result["DomainRecords"]["Record"]) {
 			if (rec.value("RR", "") == domainInfo.record && rec.value("Type", "") == type && rec.value("DomainName", "") == domainInfo.domain)
-				return rec.at("RecordId");
+				return std::pair{ rec.at("RecordId"),rec.at("Value") };
 		}
-		return "";
+		return std::pair<std::string, std::string>{};
 	}
 
 	update::update(domain_info di)

@@ -9,13 +9,9 @@ namespace HYDRA15::AliyunDDNSCpp
 {
 	void initializer::uninstall()
 	{
-		lastIPv4.clear();
-		lastIPv6.clear();
 		accessKeyID.clear();
 		accessKeySecret.clear();
 
-		delete_registry_item(regPath.appRegtabLastipv4Path.data());
-		delete_registry_item(regPath.appRegtabLastipv6Path.data());
 		delete_registry_item(regPath.appRegtabAccesskeyidPath.data());
 		delete_registry_item(regPath.appRegtabAccesskeysecretPath.data());
 	}
@@ -85,7 +81,8 @@ namespace HYDRA15::AliyunDDNSCpp
 
 	initializer::initializer()
 	{
-		secretary::log::debug(cfg.debug);
+		secretary::log::enableDebug = cfg.debug;
+		secretary::log::print = [](const std::string& str) {secretary::PrintCenter::println(assistant::strip_color(str)); };
 
 		// 初始化 commander 框架
 		try
@@ -125,10 +122,6 @@ namespace HYDRA15::AliyunDDNSCpp
 			regReady = true;
 		}
 		catch (const std::exception& e) { lgr.error(e.what()); }
-		try { lastIPv4 = get_registry_item(regPath.appRegtabLastipv4Path.data()); lgr.debug("Using last ip {}.", lastIPv4); }
-		catch (const std::exception& e) { lgr.warn(e.what()); }
-		try { lastIPv6 = get_registry_item(regPath.appRegtabLastipv6Path.data()); lgr.debug("Using last ip {}.", lastIPv6); }
-		catch (const std::exception& e) { lgr.warn(e.what()); }
 
 		// 解析json配置
 		try
@@ -157,16 +150,20 @@ namespace HYDRA15::AliyunDDNSCpp
 			// 解析url
 			try
 			{
-				ipv4url = j.at("urls").value("ipv4", "");
-				lowcase(ipv4url);
-				remove_first_substr(ipv4url, "http://");
-				remove_first_substr(ipv4url, "https://");
-				lgr.info("Using ipv4url {}.", ipv4url);
-				ipv6url = j.at("urls").value("ipv6", "");
-				lowcase(ipv6url);
-				remove_first_substr(ipv6url, "http://");
-				remove_first_substr(ipv6url, "https://");
-				lgr.info("Using ipv6url {}.", ipv6url);
+				ipv4urls = j.at("urls").value("ipv4", std::list<std::string>{});
+				for (auto& ipv4url : ipv4urls)
+				{
+					lowcase(ipv4url);
+					remove_first_substr(ipv4url, "http://");
+					remove_first_substr(ipv4url, "https://");
+				}
+				ipv6urls = j.at("urls").value("ipv6", std::list<std::string>{});
+				for (auto& ipv6url : ipv6urls)
+				{
+					lowcase(ipv6url);
+					remove_first_substr(ipv6url, "http://");
+					remove_first_substr(ipv6url, "https://");
+				}
 			}
 			catch (const std::exception& e) { lgr.error(e.what()); }
 
@@ -205,9 +202,6 @@ namespace HYDRA15::AliyunDDNSCpp
 
 	initializer::~initializer()
 	{
-		lastIPv4 = ipv4;
-		lastIPv6 = ipv6;
-
 		// 存储表项
 		if(!accessKeyID.empty())
 		{
@@ -224,24 +218,6 @@ namespace HYDRA15::AliyunDDNSCpp
 			{ 
 				set_registry_item(regPath.appRegtabAccesskeysecretPath.data(), accessKeySecret); 
 				lgr.debug("Saving registry entry {} with data {}.", regPath.appRegtabAccesskeysecretPath.data(), accessKeyID);
-			}
-			catch (const std::exception& e) { lgr.error(e.what()); lgr.error("Failed to save registry config."); }
-		}
-		if (!lastIPv4.empty())
-		{
-			try 
-			{ 
-				set_registry_item(regPath.appRegtabLastipv4Path.data(), lastIPv4); 
-				lgr.debug("Saving registry entry {} with data {}.", regPath.appRegtabLastipv4Path.data(), lastIPv4);
-			}
-			catch (const std::exception& e) { lgr.error(e.what()); lgr.error("Failed to save registry config."); }
-		}
-		if (!lastIPv6.empty())
-		{
-			try 
-			{ 
-				set_registry_item(regPath.appRegtabLastipv6Path.data(), lastIPv6); 
-				lgr.debug("Saving registry entry {} with data {}.", regPath.appRegtabLastipv6Path.data(), lastIPv6);
 			}
 			catch (const std::exception& e) { lgr.error(e.what()); lgr.error("Failed to save registry config."); }
 		}
