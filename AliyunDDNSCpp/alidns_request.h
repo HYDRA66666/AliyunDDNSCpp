@@ -19,7 +19,7 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 	class recordid :public api_requester
 	{
 		const domain_info domainInfo;
-		const std::string type;
+		std::string type;
 	public:
 		recordid(domain_info di);
 		recordid() = delete;

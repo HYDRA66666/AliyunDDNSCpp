@@ -9,7 +9,7 @@ namespace HYDRA15::AliyunDDNSCpp::api_request
 		params["Action"] = "DescribeDomainRecords";
 		params["DomainName"] = domainInfo.domain;
 		params["RRKeyWord"] = domainInfo.record;
-		params["TypeKeyWord"] = domainInfo.type == domain_info::Type::A ? "A" : "AAAA";
+		params["TypeKeyWord"] = type = domainInfo.type == domain_info::Type::A ? "A" : "AAAA";
 	}
 
 	std::string recordid::get()
