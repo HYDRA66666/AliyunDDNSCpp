@@ -35,14 +35,13 @@ namespace HYDRA15::AliyunDDNSCpp
 		static_string appRegtabRootPath = "Software\\HYDRA15\\AliyunDDNScpp\\";
 		static_string appRegtabAccesskeyidPath = "AccessKeyID";
 		static_string appRegtabAccesskeysecretPath = "AccessKeySecret";
-		static_string appRegtabLastipv4Path = "LastIPv4";
-		static_string appRegtabLastipv6Path = "LastIPv6";
 	}regPath;
 
 	// 存储带解析域名的结构
 	struct domain_info
 	{
 		std::string recordID;
+		std::string lastIP;
 		std::string domain;
 		std::string record;
 		unsigned long long ttl;

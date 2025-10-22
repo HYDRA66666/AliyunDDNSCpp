@@ -50,35 +50,40 @@ static void fetch_ip(domain_info::Type type, std::latch& lth)
 	secretary::logger lgr = UNION_CREATE_LOGGER();
 	latch_guard lg(lth);
 
-	std::string ipurl;
+	std::list<std::string> ipurls;
 	std::string* ipstr = nullptr;
 	switch (type)
 	{
 	case domain_info::Type::A:
-		ipurl = init.ipv4url; ipstr = &init.ipv4; break;
+		ipurls = init.ipv4urls; ipstr = &init.ipv4; break;
 	case domain_info::Type::AAAA:
-		ipurl = init.ipv6url; ipstr = &init.ipv6; break;
+		ipurls = init.ipv6urls; ipstr = &init.ipv6; break;
 	}
 
-	if (ipurl.empty()) { lgr.warn("IPv{0} URL not configured; skipping retrieval of IPv{0}.", type == domain_info::Type::A ? "4" : "6"); return; }
+	if (ipurls.empty()) { lgr.warn("IPv{0} URL not configured, skipping retrieval of IPv{0}.", type == domain_info::Type::A ? "4" : "6"); return; }
 
-	lgr.debug("Starting fetching ip from {}", ipurl);
-	httplib::SSLClient cli(ipurl);
-	auto resp = cli.Get("/");
+	for(const auto& ipurl:ipurls)
 
-	if (!resp)
 	{
-		lgr.error("Failed to fetch ip from {}.", ipurl);
+		lgr.debug("Starting fetching ip from {}", ipurl);
+		httplib::SSLClient cli(ipurl);
+		auto resp = cli.Get("/");
+
+		if (!resp)
+		{
+			lgr.error("Failed to fetch ip from {}.", ipurl);
+			continue;
+		}
+		if (resp->status != 200)
+		{
+			lgr.error("Failed to fetch ip from {}, code: {}, message: \n{}", ipurl, resp->status, resp->body);
+			continue;
+		}
+		*ipstr = resp->body;
+		lgr.info("Fetched public IP from {}, current IP is {}",ipurl, *ipstr);
 		return;
 	}
-	if (resp->status != 200)
-	{
-		lgr.error("Failed to fetch ip from {}, code: {}, message: \n{}", ipurl, resp->status, resp->body);
-		return;
-	}
-
-	*ipstr = resp->body;
-	lgr.info("Current public IP is {}", *ipstr);
+	lgr.error("Fetch IPv{} failed, all ipurls tried.", type == domain_info::Type::A ? "4" : "6");
 }
 
 static void resolve_domain(domain_info& domain, std::latch& lth)
@@ -90,26 +95,31 @@ static void resolve_domain(domain_info& domain, std::latch& lth)
 	std::string fullDomain = domain.record + "." + domain.domain;
 	lgr.debug("Starting resolve domain {}", fullDomain);
 
+	// 获取id
+	try 
+	{ 
+		auto [recordID, lastIP] = api_request::record(domain).get();
+		domain.recordID = recordID;
+		domain.lastIP = lastIP;
+	}
+	catch (const std::exception& e) { lgr.error("Failed to fetch recordID for domain {}", fullDomain); lgr.error(e.what()); return; }
 	// 检查ip变化
-	bool notChange = false;
 	bool noIP = false;
+	bool notChange = false;
 	switch (domain.type)
 	{
 	case domain_info::Type::A:
 		if (init.ipv4.empty())noIP = true;
-		if (init.ipv4 == init.lastIPv4)notChange = true;
+		if (init.ipv4 == domain.lastIP)notChange = true;
 		break;
 	case domain_info::Type::AAAA:
-		if (init.ipv4.empty())noIP = true;
-		if (init.ipv6 == init.lastIPv6)notChange = true;
+		if (init.ipv6.empty())noIP = true;
+		if (init.lowcase(init.ipv6) == init.lowcase(domain.lastIP))notChange = true;
 		break;
 	}
-	if (noIP) { lgr.warn("Failed to obtain the latest IP; skipping domain {}", fullDomain); return; }
+	if (noIP) { lgr.warn("Failed to obtain IP; skipping domain {}", fullDomain); return; }
 	if (notChange && !domain.forceUpdate) { lgr.info("IP not change, skipping domain {}", fullDomain); return; }
 
-	// 获取id
-	try { domain.recordID = api_request::recordid(domain).get(); }
-	catch (const std::exception& e) { lgr.error("Failed to fetch recordID for domain {}", fullDomain); lgr.error(e.what()); return; }
 
 	// 设置解析
 	if (domain.recordID.empty())	// 为空，找不到记录，则创建记录
@@ -136,9 +146,9 @@ static void resolve()
 
 	{
 		std::latch latch(2);
-		if (!init.ipv4url.empty())
+		if (!init.ipv4urls.empty())
 			init.threadpool.submit(fetch_ip, domain_info::Type::A, std::ref(latch));
-		if (!init.ipv4url.empty())
+		if (!init.ipv4urls.empty())
 			init.threadpool.submit(fetch_ip, domain_info::Type::AAAA, std::ref(latch));
 		latch.wait();
 	}
